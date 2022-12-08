@@ -1,0 +1,9 @@
+.chart-container {
+    height: 500px;
+    aspect-ratio: 1920/1080;
+    padding: 5%;
+    display: flex;
+    flex-direction: column;
+    background-color: lightgray;
+    justify-content: space-around;
+}
