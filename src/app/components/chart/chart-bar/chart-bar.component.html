@@ -1,1 +1,3 @@
-<div class="chart-bar"></div>
+<div class="chart-bar" [ngClass]="getCssColorClass()" [ngStyle]="{width: percentString}">
+    <label class="chart-bar-label"> {{ label }}</label>
+</div>
