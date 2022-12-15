@@ -1,1 +1,13 @@
-/* You can add global styles to this file, and also import other style files */
+@import url('https://fonts.googleapis.com/css2?family=Nunito+Sans&display=swap');
+@import '/src/assets/scss/themes/green-orange.scss';
+
+html, body {
+    font: 18px/22px 'Nunito Sans', sans-serif;
+    color: $font-color;
+}
+
+body {
+    margin: 0;
+    width: 100vw;
+    height: 100vh;
+}
