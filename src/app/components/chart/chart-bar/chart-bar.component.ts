@@ -1,5 +1,11 @@
 import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
 
+export enum labelType {
+	Percent,
+	Value,
+	Text,
+}
+
 @Component({
 	selector: 'app-chart-bar',
 	templateUrl: './chart-bar.component.html',
@@ -7,17 +13,20 @@ import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ChartBarComponent implements OnInit {
+	@Input() labelType: string = '';
 	@Input() label: string = '';
 	@Input() group: number = 1;
-	@Input() set percent(percent: number) {
-		this.percentString = this.createPercentValue(percent);
-	}
+	@Input() value: number = 0;
+	@Input() minValue: number = 0;
+	@Input() maxValue: number = 100;
 
-	percentString = this.createPercentValue(0);
+	percentValue: string = '';
 
 	constructor() {}
 
-	ngOnInit(): void {}
+	ngOnInit(): void {
+		this.percentValue = this.createPercentValue(this.value, this.minValue, this.maxValue);
+	}
 
 	getCssColorClass(): string {
 		switch (this.group) {
@@ -29,11 +38,10 @@ export class ChartBarComponent implements OnInit {
 		}
 	}
 
-	createPercentValue(number: number): string {
-		if (number < 0.1) {
-			number = 0.1;
-		}
+	createPercentValue(value: number, minValue: number, maxValue: number): string {
+		const barLength = maxValue - minValue;
+		const percentValue = (value / barLength) * 100;
 
-		return `${number}%`;
+		return `${percentValue}%`;
 	}
 }
