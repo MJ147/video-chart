@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Keyframe, LabelType } from './chart-bar/chart-bar.component';
+import { TimeKeyframe, LabelType } from './chart-bar/chart-bar.component';
 
 @Component({
 	selector: 'app-chart',
@@ -9,9 +9,10 @@ import { Keyframe, LabelType } from './chart-bar/chart-bar.component';
 export class ChartComponent implements OnInit {
 	LabelType: typeof LabelType = LabelType;
 
-	chartBarKeyframes: Keyframe[] = [
+	chartBarKeyframes: TimeKeyframe[] = [
 		{ time: 0, value: 0 },
-		{ time: 100, value: 100 },
+		{ time: 80, value: 100 },
+		{ time: 100, value: 200 },
 	];
 	constructor() {}
 

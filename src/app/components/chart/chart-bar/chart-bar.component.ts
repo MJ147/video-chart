@@ -1,5 +1,4 @@
-import { animate, AnimationKeyframesSequenceMetadata, keyframes, state, style, transition, trigger } from '@angular/animations';
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
+import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
 
 export enum LabelType {
 	Percent,
@@ -7,46 +6,40 @@ export enum LabelType {
 	Text,
 }
 
-export interface Keyframe {
-	value: number;
+export interface TimeKeyframe {
 	time: number;
-}
-
-function getKeyframes(): AnimationKeyframesSequenceMetadata {
-	return keyframes([
-		style({ width: '{{keyframe1}}%', offset: 0 }),
-		style({ width: '{{keyframe2}}%', offset: 0.5 }),
-		style({ width: '{{keyframe3}}%', offset: 1 }),
-	]);
+	value: number;
 }
 
 @Component({
 	selector: 'app-chart-bar',
 	templateUrl: './chart-bar.component.html',
 	styleUrls: ['./chart-bar.component.scss'],
-	animations: [
-		trigger('keyframes', [
-			state('fadeIn', style({ width: '0%' })),
-			state('fadeOut', style({ width: '100%' })),
-			transition('* => fadeOut', [animate('5s .5s', getKeyframes())]),
-		]),
-	],
 })
 export class ChartBarComponent implements OnInit {
 	@Input() labelType: LabelType = LabelType.Value;
 	@Input() label: string = '';
 	@Input() group: number = 1;
-	@Input() keyframes: Keyframe[] = [];
+	@Input() keyframes: TimeKeyframe[] = [];
 
 	percentValue: string = '';
-	animationState: 'fadeIn' | 'fadeOut' = 'fadeIn';
 
 	constructor() {}
+
+	@ViewChild('chartBar') chartBar: ElementRef | null = null;
 
 	ngOnInit(): void {}
 
 	ngAfterViewInit(): void {
-		this.animationState = 'fadeOut';
+		const newspaperSpinning: Keyframe[] = this.mapKeyframes(this.keyframes);
+
+		const newspaperTiming = {
+			duration: 4000,
+			iterations: 1,
+		};
+		console.log(this.chartBar?.nativeElement);
+
+		this.chartBar?.nativeElement?.animate(newspaperSpinning, newspaperTiming);
 	}
 
 	getCssColorClass(): string {
@@ -64,6 +57,13 @@ export class ChartBarComponent implements OnInit {
 		const percentValue = (value / barLength) * 100;
 
 		return `${percentValue}%`;
+	}
+
+	mapKeyframes(keyframes: TimeKeyframe[]): Keyframe[] {
+		const animationTime = Math.max(...keyframes.map(({ time }) => time));
+		const maxValue = Math.max(...keyframes.map(({ value }) => value));
+
+		return keyframes.map((keyframe) => ({ offset: keyframe.time / animationTime, width: `${(keyframe.value / maxValue) * 100}%` }));
 	}
 
 	// getBarLabel(): string {
