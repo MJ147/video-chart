@@ -21,6 +21,14 @@
     white-space: nowrap;
 }
 
+.chart-bar__value {
+    position: absolute;
+    width: 100%;
+    text-align: right;
+    top: 100%;
+    white-space: nowrap;
+}
+
 .background-primary {
     background: $primary-color;
 } 

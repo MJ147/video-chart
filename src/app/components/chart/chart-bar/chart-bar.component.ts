@@ -22,24 +22,28 @@ export class ChartBarComponent implements OnInit {
 	@Input() group: number = 1;
 	@Input() keyframes: TimeKeyframe[] = [];
 
-	percentValue: string = '';
+	animationTime: number | null = null;
+	maxValue: number | null = null;
 
 	constructor() {}
 
 	@ViewChild('chartBar') chartBar: ElementRef | null = null;
 
-	ngOnInit(): void {}
+	ngOnInit(): void {
+		this.animationTime = Math.max(...this.keyframes.map(({ time }) => time));
+		this.maxValue = Math.max(...this.keyframes.map(({ value }) => value));
+	}
 
 	ngAfterViewInit(): void {
-		const newspaperSpinning: Keyframe[] = this.mapKeyframes(this.keyframes);
+		const mappedKeyframes: Keyframe[] = this.mapKeyframes(this.keyframes);
 
-		const newspaperTiming = {
+		const animationTiming = {
 			duration: 4000,
 			iterations: 1,
+			fill: 'forwards',
 		};
-		console.log(this.chartBar?.nativeElement);
 
-		this.chartBar?.nativeElement?.animate(newspaperSpinning, newspaperTiming);
+		this.chartBar?.nativeElement?.animate(mappedKeyframes, animationTiming);
 	}
 
 	getCssColorClass(): string {
@@ -59,11 +63,23 @@ export class ChartBarComponent implements OnInit {
 		return `${percentValue}%`;
 	}
 
-	mapKeyframes(keyframes: TimeKeyframe[]): Keyframe[] {
-		const animationTime = Math.max(...keyframes.map(({ time }) => time));
-		const maxValue = Math.max(...keyframes.map(({ value }) => value));
+	private mapKeyframes(keyframes: TimeKeyframe[]): Keyframe[] {
+		return keyframes.map((keyframe) => {
+			if (this.animationTime == null || this.maxValue == null) {
+				return {};
+			}
 
-		return keyframes.map((keyframe) => ({ offset: keyframe.time / animationTime, width: `${(keyframe.value / maxValue) * 100}%` }));
+			return {
+				offset: keyframe.time / this.animationTime,
+				width: `${(keyframe.value / this.maxValue) * 100}%`,
+			};
+		});
+	}
+
+	get value(): number {
+		console.dir(this.chartBar?.nativeElement?.offsetWidth);
+
+		return this.chartBar?.nativeElement?.offsetWidth;
 	}
 
 	// getBarLabel(): string {
