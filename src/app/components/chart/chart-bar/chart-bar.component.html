@@ -1,4 +1,4 @@
 <div #chartBar class="chart-bar" [ngClass]="getCssColorClass()">
     <label class="chart-bar__label">{{ label }}</label>
-    <label class="chart-bar__value">{{ value }}</label>
+    <label class="chart-bar__value">{{ value }}{{ isPercentValue ? '%' : '' }}</label>
 </div>

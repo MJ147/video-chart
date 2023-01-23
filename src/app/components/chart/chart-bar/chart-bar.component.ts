@@ -1,15 +1,5 @@
 import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
-
-export enum LabelType {
-	Percent,
-	Value,
-	Text,
-}
-
-export interface TimeKeyframe {
-	time: number;
-	value: number;
-}
+import { TimeKeyframe } from 'src/app/interfaces/chart-bar.interface';
 
 @Component({
 	selector: 'app-chart-bar',
@@ -17,13 +7,14 @@ export interface TimeKeyframe {
 	styleUrls: ['./chart-bar.component.scss'],
 })
 export class ChartBarComponent implements OnInit {
-	@Input() labelType: LabelType = LabelType.Value;
+	@Input() isPercentValue: boolean = false;
 	@Input() label: string = '';
 	@Input() group: number = 1;
 	@Input() keyframes: TimeKeyframe[] = [];
 
-	animationTime: number | null = null;
-	maxValue: number | null = null;
+	animationTime: number = 0;
+	maxValue: number = 0;
+	value: number = 0;
 
 	constructor() {}
 
@@ -32,13 +23,17 @@ export class ChartBarComponent implements OnInit {
 	ngOnInit(): void {
 		this.animationTime = Math.max(...this.keyframes.map(({ time }) => time));
 		this.maxValue = Math.max(...this.keyframes.map(({ value }) => value));
+
+		setInterval(() => {
+			this.setValue(this.isPercentValue);
+		}, 100);
 	}
 
 	ngAfterViewInit(): void {
 		const mappedKeyframes: Keyframe[] = this.mapKeyframes(this.keyframes);
 
 		const animationTiming = {
-			duration: 4000,
+			duration: this.animationTime,
 			iterations: 1,
 			fill: 'forwards',
 		};
@@ -65,10 +60,6 @@ export class ChartBarComponent implements OnInit {
 
 	private mapKeyframes(keyframes: TimeKeyframe[]): Keyframe[] {
 		return keyframes.map((keyframe) => {
-			if (this.animationTime == null || this.maxValue == null) {
-				return {};
-			}
-
 			return {
 				offset: keyframe.time / this.animationTime,
 				width: `${(keyframe.value / this.maxValue) * 100}%`,
@@ -76,23 +67,10 @@ export class ChartBarComponent implements OnInit {
 		});
 	}
 
-	get value(): number {
-		console.dir(this.chartBar?.nativeElement?.offsetWidth);
-
-		return this.chartBar?.nativeElement?.offsetWidth;
+	setValue(isPercentValue: boolean): void {
+		const max = this.chartBar?.nativeElement?.parentNode?.offsetWidth;
+		const progress = this.chartBar?.nativeElement?.offsetWidth;
+		const maxValue = isPercentValue ? 100 : this.maxValue;
+		this.value = Math.round((progress / max) * maxValue);
 	}
-
-	// getBarLabel(): string {
-	// 	switch (this.labelType) {
-	// 		case LabelType.Text:
-	// 		default:
-	// 			return this.label;
-
-	// 		case LabelType.Value:
-	// 			return `${this.value}`;
-
-	// 		case LabelType.Percent:
-	// 			return `${this.percentValue}`;
-	// 	}
-	// }
 }

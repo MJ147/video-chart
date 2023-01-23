@@ -1,13 +1,11 @@
 <div class="chart-container">
-    <app-chart-bar [keyframes]="chartBarKeyframes" [group]="1" [labelType]="LabelType.Percent" label="LABEL 1"></app-chart-bar>
-    <app-chart-bar [keyframes]="chartBarKeyframes" [group]="1" [labelType]="LabelType.Percent" label="LABEL 2"></app-chart-bar>
-    <app-chart-bar [keyframes]="chartBarKeyframes" [group]="1" [labelType]="LabelType.Percent" label="LABEL 3"></app-chart-bar>
-    <app-chart-bar [keyframes]="chartBarKeyframes" [group]="1" [labelType]="LabelType.Percent" label="LABEL 4"></app-chart-bar>
-    <app-chart-bar [keyframes]="chartBarKeyframes" [group]="1" [labelType]="LabelType.Percent" label="LABEL 5"></app-chart-bar>
-
-    <app-chart-bar [keyframes]="chartBarKeyframes" [group]="2" [labelType]="LabelType.Percent" label="LABEL 1"></app-chart-bar>
-    <app-chart-bar [keyframes]="chartBarKeyframes" [group]="2" [labelType]="LabelType.Percent" label="LABEL 2"></app-chart-bar>
-    <app-chart-bar [keyframes]="chartBarKeyframes" [group]="2" [labelType]="LabelType.Percent" label="LABEL 3"></app-chart-bar>
-    <app-chart-bar [keyframes]="chartBarKeyframes" [group]="2" [labelType]="LabelType.Percent" label="LABEL 4"></app-chart-bar>
-    <app-chart-bar [keyframes]="chartBarKeyframes" [group]="2" [labelType]="LabelType.Percent" label="LABEL 5"></app-chart-bar>
+    <ng-container *ngFor="let chartBarGroup of barChart.chartBarGroups">
+        <app-chart-bar 
+            *ngFor="let chartBar of chartBarGroup.chartBars" 
+            [keyframes]="chartBar.keyframes"
+            [group]="chartBarGroup.groupId" 
+            [isPercentValue]="chartBar.isPercentValue" 
+            [label]="chartBar.label"
+        ></app-chart-bar>
+    </ng-container>
 </div>
