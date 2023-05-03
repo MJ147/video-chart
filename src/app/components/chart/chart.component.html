@@ -1,7 +1,11 @@
 <div class="chart-container">
-    <app-chart-bar></app-chart-bar>
-    <app-chart-bar></app-chart-bar>
-    <app-chart-bar></app-chart-bar>
-    <app-chart-bar></app-chart-bar>
-    <app-chart-bar></app-chart-bar>
+    <ng-container *ngFor="let chartBarGroup of barChart.chartBarGroups">
+        <app-chart-bar 
+            *ngFor="let chartBar of chartBarGroup.chartBars" 
+            [keyframes]="chartBar.keyframes"
+            [group]="chartBarGroup.groupId" 
+            [isPercentValue]="chartBar.isPercentValue" 
+            [label]="chartBar.label"
+        ></app-chart-bar>
+    </ng-container>
 </div>
