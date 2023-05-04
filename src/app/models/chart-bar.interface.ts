@@ -1,9 +1,4 @@
 export interface BarChart {
-	chartBarGroups: ChartBarGroup[];
-}
-
-export interface ChartBarGroup {
-	groupId: number;
 	chartBars: ChartBar[];
 }
 

@@ -1,5 +1,7 @@
+import { ChartBar } from './../../../models/chart-bar.interface';
 import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
-import { TimeKeyframe } from 'src/app/interfaces/chart-bar.interface';
+import { TimeKeyframe } from 'src/app/models/chart-bar.interface';
+import { XlsService } from 'src/app/services/xls/xls.service';
 
 @Component({
 	selector: 'app-chart-bar',
@@ -7,10 +9,7 @@ import { TimeKeyframe } from 'src/app/interfaces/chart-bar.interface';
 	styleUrls: ['./chart-bar.component.scss'],
 })
 export class ChartBarComponent implements OnInit {
-	@Input() isPercentValue: boolean = false;
-	@Input() label: string = '';
-	@Input() group: number = 1;
-	@Input() keyframes: TimeKeyframe[] = [];
+	@Input() chartBar: ChartBar | null = null;
 
 	animationTime: number = 0;
 	maxValue: number = 0;
@@ -18,19 +17,27 @@ export class ChartBarComponent implements OnInit {
 
 	constructor() {}
 
-	@ViewChild('chartBar') chartBar: ElementRef | null = null;
+	@ViewChild('chartBarRef') chartBarRef: ElementRef | null = null;
 
 	ngOnInit(): void {
-		this.animationTime = Math.max(...this.keyframes.map(({ time }) => time));
-		this.maxValue = Math.max(...this.keyframes.map(({ value }) => value));
+		if (this.isChartBarNullish(this.chartBar)) {
+			return;
+		}
+
+		this.animationTime = Math.max(...this.chartBar.keyframes.map(({ time }) => time));
+		this.maxValue = Math.max(...this.chartBar.keyframes.map(({ value }) => value));
 
 		setInterval(() => {
-			this.setValue(this.isPercentValue);
+			this.setValue(this.chartBar?.isPercentValue ?? false);
 		}, 100);
 	}
 
 	ngAfterViewInit(): void {
-		const mappedKeyframes: Keyframe[] = this.mapKeyframes(this.keyframes);
+		if (this.isChartBarNullish(this.chartBar)) {
+			return;
+		}
+
+		const mappedKeyframes: Keyframe[] = this.mapKeyframes(this.chartBar.keyframes);
 
 		const animationTiming = {
 			duration: this.animationTime,
@@ -38,17 +45,7 @@ export class ChartBarComponent implements OnInit {
 			fill: 'forwards',
 		};
 
-		this.chartBar?.nativeElement?.animate(mappedKeyframes, animationTiming);
-	}
-
-	getCssColorClass(): string {
-		switch (this.group) {
-			case 1:
-			default:
-				return 'background-primary';
-			case 2:
-				return 'background-secondary';
-		}
+		this.chartBarRef?.nativeElement?.animate(mappedKeyframes, animationTiming);
 	}
 
 	createPercentValue(value: number, minValue: number, maxValue: number): string {
@@ -68,9 +65,13 @@ export class ChartBarComponent implements OnInit {
 	}
 
 	setValue(isPercentValue: boolean): void {
-		const max = this.chartBar?.nativeElement?.parentNode?.offsetWidth;
-		const progress = this.chartBar?.nativeElement?.offsetWidth;
+		const max = this.chartBarRef?.nativeElement?.parentNode?.offsetWidth;
+		const progress = this.chartBarRef?.nativeElement?.offsetWidth;
 		const maxValue = isPercentValue ? 100 : this.maxValue;
 		this.value = Math.round((progress / max) * maxValue);
+	}
+
+	isChartBarNullish(chartBar: ChartBar | null): chartBar is null {
+		return this.chartBar == null;
 	}
 }
