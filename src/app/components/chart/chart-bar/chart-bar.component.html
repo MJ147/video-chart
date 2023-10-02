@@ -1,4 +1,4 @@
 <div #chartBarRef class="chart-bar bar-color">
     <label class="chart-bar__label">{{ chartBar?.label }}</label>
-    <label class="chart-bar__value">{{ value }}{{ chartBar?.isPercentValue ? '%' : '' }}</label>
+    <label class="chart-bar__value">{{ value | number:'1.2-2'}}{{ chartBar?.isPercentValue ? '%' : '' }}</label>
 </div>

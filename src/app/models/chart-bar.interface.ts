@@ -1,14 +1,17 @@
 export interface BarChart {
-	chartBars: ChartBar[];
+	minValue: number;
+	maxValue: number;
+	duration: number; //ms
+	bars: Bar[];
 }
 
-export interface ChartBar {
+export interface Bar {
 	label: string;
 	isPercentValue: boolean;
-	keyframes: TimeKeyframe[];
+	dataset: Point[];
 }
 
-export interface TimeKeyframe {
-	time: number;
-	value: number;
+export interface Point {
+	x: number;
+	y: number;
 }

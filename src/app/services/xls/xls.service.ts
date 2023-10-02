@@ -1,11 +1,12 @@
 import { Injectable } from '@angular/core';
-import { BarChart, ChartBar } from 'src/app/models/chart-bar.interface';
+import { BarChart, Bar, Point } from 'src/app/models/chart-bar.interface';
 import { read, utils } from 'xlsx';
 
 @Injectable({
 	providedIn: 'root',
 })
 export class XlsService {
+	readonly DURATION_TIME: number = 20000;
 	private _chartData$: Promise<BarChart>;
 
 	constructor() {
@@ -21,17 +22,25 @@ export class XlsService {
 	}
 
 	convertToChartData(xlsData: { [key: string]: string }[]): BarChart {
-		const barChartData: BarChart = { chartBars: [] };
-		xlsData.slice(0, 5).forEach((dataset) => {
-			const datasetEntries = Object.entries(dataset).slice(0, -2);
-			// const label = datasetEntries[datasetEntries.length - 1][1];
-			const label = 'test';
-			const keyframes = datasetEntries.map((entry) => ({ time: Number(entry[0]), value: Number(entry[1]) }));
-			const chartBar: ChartBar = { isPercentValue: false, keyframes, label };
-			barChartData.chartBars.push(chartBar);
-		});
+		const barChart: BarChart = { bars: [], minValue: null, maxValue: null, duration: this.DURATION_TIME };
 
-		return barChartData;
+		xlsData.slice(3, 4).forEach((dataset) => {
+			const datasetEntries = Object.entries(dataset).slice(0, -2);
+			const label = 'test';
+			const keyframes: Point[] = datasetEntries.map((entry) => {
+				const x = Number(entry[1]);
+				const y = Number(entry[0]);
+				barChart.minValue = Math.min(barChart.minValue ?? x, x);
+				barChart.maxValue = Math.max(barChart.maxValue ?? x, x);
+
+				return { x, y };
+			});
+			const chartBar: Bar = { isPercentValue: false, dataset: keyframes, label };
+			barChart.bars.push(chartBar);
+		});
+		console.log(barChart.bars);
+
+		return barChart;
 	}
 
 	async setChartData(): Promise<BarChart> {

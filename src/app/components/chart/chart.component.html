@@ -1,6 +1,9 @@
 <div class="chart-container">
     <app-chart-bar 
-        *ngFor="let chartBar of barChart?.chartBars" 
+        *ngFor="let chartBar of barChart?.bars" 
         [chartBar]="chartBar"
+        [maxValue]="barChart?.maxValue"
+        [minValue]="barChart?.minValue"
+        [duration]="barChart?.duration"
     ></app-chart-bar>
 </div>
