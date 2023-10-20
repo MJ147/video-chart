@@ -1,3 +1,5 @@
+import { firstValueFrom } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BarChart, Bar, Point } from 'src/app/models/chart-bar.interface';
 import { read, utils } from 'xlsx';
@@ -6,10 +8,10 @@ import { read, utils } from 'xlsx';
 	providedIn: 'root',
 })
 export class XlsService {
-	readonly DURATION_TIME: number = 20000;
+	readonly DURATION_TIME: number = 560000;
 	private _chartData$: Promise<BarChart>;
 
-	constructor() {
+	constructor(private http: HttpClient) {
 		this._chartData$ = this.setChartData();
 	}
 
@@ -21,12 +23,29 @@ export class XlsService {
 		return data;
 	}
 
-	convertToChartData(xlsData: { [key: string]: string }[]): BarChart {
-		const barChart: BarChart = { bars: [], minValue: null, maxValue: null, duration: this.DURATION_TIME };
+	async redCsv(): Promise<any> {
+		const file = '/assets/data-files/chart-data.csv';
+		return firstValueFrom(this.http.get(file, { responseType: 'text' }));
+	}
 
-		xlsData.slice(3, 4).forEach((dataset) => {
+	async setChartData(): Promise<BarChart> {
+		const xlsData = await this.redCsv();
+
+		return this.convertToChartData(xlsData);
+	}
+
+	get chartData$(): Promise<BarChart> {
+		return this._chartData$;
+	}
+
+	private convertToChartData(xlsData: { [key: string]: string }[]): BarChart {
+		const barChart: BarChart = { bars: [], minValue: null, maxValue: null, duration: this.DURATION_TIME };
+		console.log(xlsData);
+
+		xlsData.slice(10, 20).forEach((dataset) => {
 			const datasetEntries = Object.entries(dataset).slice(0, -2);
-			const label = 'test';
+
+			const label = dataset.name;
 			const keyframes: Point[] = datasetEntries.map((entry) => {
 				const x = Number(entry[1]);
 				const y = Number(entry[0]);
@@ -38,18 +57,7 @@ export class XlsService {
 			const chartBar: Bar = { isPercentValue: false, dataset: keyframes, label };
 			barChart.bars.push(chartBar);
 		});
-		console.log(barChart.bars);
 
 		return barChart;
-	}
-
-	async setChartData(): Promise<BarChart> {
-		const xlsData = await this.readXls();
-
-		return this.convertToChartData(xlsData);
-	}
-
-	get chartData$(): Promise<BarChart> {
-		return this._chartData$;
 	}
 }
